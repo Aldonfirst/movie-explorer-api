@@ -18,7 +18,7 @@ const app = express();
 app.use(cors({
   credentials: true,
   maxAge: 15,
-  origin: ['http://localhost:3000', 'https://aldonmovie.nomoredomainsicu.ru'],
+  origin: ['http://localhost:3001', 'https://aldonmovie.nomoredomainsicu.ru'],
 }));
 
 app.use(bodyParser.json());
