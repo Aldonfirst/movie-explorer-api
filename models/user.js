@@ -3,6 +3,13 @@ const { isEmail } = require('validator');
 const { validationMessage } = require('../utils/errorMessage');
 
 const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    default: 'Пользователь',
+    required: [true, validationMessage.required],
+    minlength: [2, validationMessage.minlength],
+    maxlength: [30, validationMessage.maxlength],
+  },
   email: {
     type: String,
     required: [true, validationMessage.required],
@@ -17,17 +24,9 @@ const userSchema = new mongoose.Schema({
     required: [true, validationMessage.required],
     select: false,
   },
-  name: {
-    type: String,
-    // default: 'Пользователь',
-    required: [true, validationMessage.required],
-    minlength: [2, validationMessage.minlength],
-    maxlength: [30, validationMessage.maxlength],
-  },
+
 }, {
   versionKey: false,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true },
 });
 
 module.exports = mongoose.model('user', userSchema);
