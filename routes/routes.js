@@ -19,9 +19,9 @@ router.post('/signin', validateLogin, login);
 
 router.use(authMiddleware);
 
-router.get('/signout', (req, res) => {
-  res.clearCookie('token').send({ message: 'Пользователь вышел из своего Аккаунта' });
-});
+// router.get('/signout', (req, res) => {
+//   res.clearCookie('token').send({ message: 'Пользователь вышел из своего Аккаунта' });
+// });
 
 router.use(usersRouter);
 router.use(moviesRouter);

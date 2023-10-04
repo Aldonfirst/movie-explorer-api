@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -9,7 +8,7 @@ const { errors } = require('celebrate');
 
 const limiter = require('./utils/limiter');
 const { PORT, DB_ADDRESS } = require('./utils/config');
-const router = require('./routes/routes');
+const routes = require('./routes/routes');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 
@@ -30,7 +29,7 @@ app.use(helmet());
 
 app.use(requestLogger);
 app.use(limiter);
-app.use(router);
+app.use(routes);
 app.use(errorLogger);
 
 app.use(errors());

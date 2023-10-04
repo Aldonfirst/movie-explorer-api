@@ -4,19 +4,24 @@ const UnauthorizedError = require('../utils/errorsCatch/UnauthorizedError');
 const { JWT_SECRET, NODE_ENV } = require('../utils/config');
 
 function authMiddleware(req, res, next) {
-  const { token } = req.cookies;
+  const { authorization } = req.headers;
 
-  if (!token) {
+  if (!authorization || !authorization.startsWith('Bearer ')) {
     throw new UnauthorizedError('Требуется авторизация пользователя');
   }
 
+  const token = authorization.replace('Bearer ', '');
+  let payload;
+
   try {
-    const payload = jwt.verify(token, NODE_ENV ? JWT_SECRET : 'dev-secret');
-    req.user = payload;
-    next();
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (err) {
-    next(err);
+    return next(new UnauthorizedError('Требуется авторизация '));
   }
+
+  req.user = payload;
+
+  return next();
 }
 
 module.exports = {

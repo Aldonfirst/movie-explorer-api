@@ -11,9 +11,15 @@ const BadRequestError = require('../utils/errorsCatch/BadRequestError');
 module.exports.createUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      throw new ConflictError('Пользователь с таким электронным адресом уже зарегистрирован');
+    }
     const hash = await bcrypt.hash(password, 10);
-    await User.create({ name, email, password: hash });
-    res.status(201).send({ name, email });
+    const user = await User.create({ name, email, password: hash });
+    const selectedUser = await User.findById(user._id).select('-password');
+    res.status(201).send(selectedUser);
   } catch (err) {
     if (err.name === 'MongoServerError' && err.code === 11000) {
       next(new ConflictError('Пользователь с таким электронным адресом уже зарегистрирован'));
@@ -29,15 +35,16 @@ module.exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
-    if (!user || !bcrypt.compareSync(password, user.password)) {
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!user || !isPasswordCorrect) {
       throw new UnauthorizedError('Ошибка при авторизации пользователя');
     }
     const token = jwt.sign(
       { _id: user._id },
-      NODE_ENV ? JWT_SECRET : 'dev-secret',
+      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
       { expiresIn: '7d' },
     );
-    res.cookie('token', token, { httpOnly: true }).send({ token });
+    res.cookie('token', token, { httpOnly: true }).status(200).send({ token });
   } catch (err) {
     next(err);
   }
@@ -46,10 +53,10 @@ module.exports.login = async (req, res, next) => {
 module.exports.getUserInfo = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const user = await User.findById(userId).orFail(() => {
+    const user = await User.findById(userId).select('-password').orFail(() => {
       throw new NotFoundError('Пользователь по указанному _id не найден');
     });
-    res.send(user);
+    res.status(200).send(user);
   } catch (err) {
     next(err);
   }
@@ -63,11 +70,11 @@ module.exports.updateUser = async (req, res, next) => {
       _id,
       { name, email },
       { new: true, runValidators: true },
-    )
+    ).select('-password')
       .orFail(() => {
         throw new NotFoundError('Пользователь с таким _id не найден');
       });
-    res.send(updatedUser);
+    res.status(200).send(updatedUser);
   } catch (err) {
     if (err.name === 'MongoServerError' && err.code === 11000) {
       next(new ConflictError('Пользователь с таким email адресом уже зарегистрирован'));

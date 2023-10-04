@@ -1,40 +1,47 @@
 const { celebrate, Joi, Segments } = require('celebrate');
-const { URL_REGEX } = require('../utils/constants');
+const { URL_REGEX, regExpEmail } = require('../utils/constants');
 
 const validateRegister = celebrate({
   [Segments.BODY]: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(URL_REGEX),
-    email: Joi.string().email().required(),
-    password: Joi.string().required().min(3),
+    name: Joi.string().min(2).max(30).required(),
+    email: Joi.string().required().pattern(regExpEmail),
+    password: Joi.string().required(),
   }),
 });
 
 const validateLogin = celebrate({
   [Segments.BODY]: Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().required().min(3),
+    email: Joi.string().email().required().pattern(regExpEmail),
+    password: Joi.string().required(),
   }),
 });
 
 const validateUpdateProfile = celebrate({
   [Segments.BODY]: Joi.object().keys({
     name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
+    email: Joi.string().required().pattern(regExpEmail),
   }),
 });
 
 const validateMovieId = celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    cardId: Joi.string().hex().length(24).required(),
+    id: Joi.string().required().hex().length(24),
   }),
 });
 
 const validateCreateMovie = celebrate({
   [Segments.BODY]: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(URL_REGEX),
+    country: Joi.string().required(),
+    director: Joi.string().required(),
+    duration: Joi.number().required(),
+    year: Joi.string().required(),
+    description: Joi.string().required(),
+    image: Joi.string().required().pattern(URL_REGEX),
+    trailerLink: Joi.string().required().pattern(URL_REGEX),
+    thumbnail: Joi.string().required().pattern(URL_REGEX),
+    movieId: Joi.number().required(),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required(),
   }),
 });
 
