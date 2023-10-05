@@ -18,7 +18,7 @@ module.exports.createUser = async (req, res, next) => {
     }
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hash });
-    const selectedUser = await User.findById(user._id).select('-password');
+    const selectedUser = await User.findById(user._id);
     res.status(201).send(selectedUser);
   } catch (err) {
     if (err.name === 'MongoServerError' && err.code === 11000) {
