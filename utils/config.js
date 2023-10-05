@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const { JWT_SECRET } = process.env;
 
-const { PORT = 3000 } = process.env;
+const { PORT = 4000 } = process.env;
 const { DB_ADDRESS = 'mongodb://127.0.0.1:27017/bitfilmsdb' } = process.env;
 const { NODE_ENV = 'production' } = process.env;
 module.exports = {
