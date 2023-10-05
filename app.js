@@ -13,12 +13,11 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 
 mongoose.connect(DB_ADDRESS, { useNewUrlParser: true });
-
 const app = express();
 app.use(cors({
   credentials: true,
   maxAge: 15,
-  origin: ['https://aldonmovie.nomoredomainsicu.ru', 'http://localhost:3001'],
+  origin: ['https://aldonmovie.nomoredomainsicu.ru', 'http://aldonmovie.nomoredomainsicu.ru', 'http://localhost:3001'],
 }));
 
 app.use(bodyParser.json());
