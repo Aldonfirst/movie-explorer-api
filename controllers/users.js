@@ -31,43 +31,27 @@ module.exports.createUser = async (req, res, next) => {
   }
 };
 // авторизация
-// module.exports.login = async (req, res, next) => {
-//   try {
-//     const { email, password } = req.body;
-//     const user = await User.findOne({ email }).select('+password');
-//     const isPasswordCorrect = await bcrypt.compare(password, user.password);
-//     if (!user || !isPasswordCorrect) {
-//       throw new UnauthorizedError('Ошибка при авторизации пользователя');
-//     }
-//     const token = jwt.sign(
-//       { _id: user._id },
-//       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-//       { expiresIn: '7d' },
-//     );
-//     res.status(200).send({ token });
-//     // res.cookie('token', token, { httpOnly: true }).status(200).send({ token });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-module.exports.login = (req, res, next) => {
-  const { email, password } = req.body;
-  User.findOne({ email }).select('+password')
-    .then((user) => {
-      if (!user || !bcrypt.compareSync(password, user.password)) {
-        throw new UnauthorizedError('Ошибка при авторизации пользователя');
-      }
-      console.log(user);
-      console.log(bcrypt);
-      const token = jwt.sign(
-        { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-        { expiresIn: '7d' },
-      );
-      console.log(token);
-      res.status(200).send({ token });
-    })
-    .catch((err) => next(err));
+module.exports.login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email }).select('+password');
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!user || !isPasswordCorrect) {
+      throw new UnauthorizedError('Ошибка при авторизации пользователя');
+    }
+    console.log(user);
+    console.log(isPasswordCorrect);
+    const token = jwt.sign(
+      { _id: user._id },
+      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+      { expiresIn: '7d' },
+    );
+    console.log(token);
+    res.status(200).send({ token });
+    // res.cookie('token', token, { httpOnly: true }).status(200).send({ token });
+  } catch (err) {
+    next(err);
+  }
 };
 // гет запрос users/me
 module.exports.getUserInfo = async (req, res, next) => {
