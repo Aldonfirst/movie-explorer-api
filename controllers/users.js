@@ -36,9 +36,6 @@ module.exports.login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!user || !isPasswordCorrect) {
-      throw new UnauthorizedError('Ошибка при авторизации пользователя');
-    }
     console.log(user);
     console.log(isPasswordCorrect);
     const token = jwt.sign(
