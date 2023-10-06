@@ -7,12 +7,12 @@ const cors = require('cors');
 const { errors } = require('celebrate');
 
 const limiter = require('./utils/limiter');
-const { PORT, DB_ADDRESS } = require('./utils/config');
+const { PORT, DB_URL } = require('./utils/config');
 const routes = require('./routes/routes');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 
-mongoose.connect(DB_ADDRESS, { useNewUrlParser: true });
+mongoose.connect(DB_URL, { useNewUrlParser: true });
 const app = express();
 app.use(cors({
   credentials: true,
