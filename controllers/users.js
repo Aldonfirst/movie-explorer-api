@@ -18,7 +18,7 @@ module.exports.createUser = async (req, res, next) => {
     }
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hash });
-    const selectedUser = await User.findById(user._id).select('-password');
+    const selectedUser = await User.findById(user._id);
     res.status(201).send(selectedUser);
   } catch (err) {
     if (err.name === 'MongoServerError' && err.code === 11000) {
@@ -53,9 +53,10 @@ module.exports.login = async (req, res, next) => {
 module.exports.getUserInfo = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const user = await User.findById(userId).select('-password').orFail(() => {
-      throw new NotFoundError('Пользователь по указанному _id не найден');
-    });
+    const user = await User.findById(userId)
+      .orFail(() => {
+        throw new NotFoundError('Пользователь по указанному _id не найден');
+      });
     res.status(200).send(user);
   } catch (err) {
     next(err);
@@ -70,7 +71,7 @@ module.exports.updateUser = async (req, res, next) => {
       _id,
       { name, email },
       { new: true, runValidators: true },
-    ).select('-password')
+    )
       .orFail(() => {
         throw new NotFoundError('Пользователь с таким _id не найден');
       });
