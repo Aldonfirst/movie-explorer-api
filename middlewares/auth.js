@@ -16,7 +16,7 @@ function authMiddleware(req, res, next) {
   try {
     payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (err) {
-    return next(new UnauthorizedError('Требуется авторизация '));
+    return next(new UnauthorizedError('Требуется авторизация пользователя'));
   }
 
   req.user = payload;
