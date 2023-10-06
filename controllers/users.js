@@ -39,11 +39,14 @@ module.exports.login = async (req, res, next) => {
     if (!user || !isPasswordCorrect) {
       throw new UnauthorizedError('Ошибка при авторизации пользователя');
     }
+    console.log(user);
+    console.log(isPasswordCorrect);
     const token = jwt.sign(
       { _id: user._id },
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
       { expiresIn: '7d' },
     );
+    console.log(token);
     res.status(200).send({ token });
     // res.cookie('token', token, { httpOnly: true }).status(200).send({ token });
   } catch (err) {
