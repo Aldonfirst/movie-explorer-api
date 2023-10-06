@@ -44,7 +44,8 @@ module.exports.login = async (req, res, next) => {
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
       { expiresIn: '7d' },
     );
-    res.cookie('token', token, { httpOnly: true }).status(200).send({ token });
+    res.status(200).send({ token });
+    // res.cookie('token', token, { httpOnly: true }).status(200).send({ token });
   } catch (err) {
     next(err);
   }
