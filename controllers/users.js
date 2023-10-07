@@ -12,7 +12,7 @@ module.exports.createUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
     const existingUser = await User.findOne({ email });
-
+    console.log(existingUser);
     if (existingUser) {
       throw new ConflictError('Пользователь с таким электронным адресом уже зарегистрирован');
     }
@@ -20,7 +20,8 @@ module.exports.createUser = async (req, res, next) => {
     const user = await User.create({ name, email, password: hash });
     const selectedUser = await User.findById(user._id);
     console.log('Пользователь успешно создан:', selectedUser);
-
+    req.user = user;
+    next();
     res.status(201).send(selectedUser);
   } catch (err) {
     if (err.name === 'MongoServerError' && err.code === 11000) {
@@ -36,15 +37,14 @@ module.exports.createUser = async (req, res, next) => {
 module.exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    console.log(req.body);
     const user = await User.findOne({ email }).select('+password');
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!user || !isPasswordCorrect) {
       throw new UnauthorizedError('Ошибка при авторизации пользователя');
     }
-
     console.log('Пользователь успешно вошел:', user);
     console.log('Пароль верный:', isPasswordCorrect);
-
     const token = jwt.sign(
       { _id: user._id },
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
@@ -52,7 +52,6 @@ module.exports.login = async (req, res, next) => {
     );
     console.log('Сгенерированный токен:', token);
     res.status(200).send({ token });
-    // res.cookie('token', token, { httpOnly: true }).status(200).send({ token });
   } catch (err) {
     next(err);
   }
