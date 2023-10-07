@@ -20,8 +20,6 @@ module.exports.createUser = async (req, res, next) => {
     const user = await User.create({ name, email, password: hash });
     const selectedUser = await User.findById(user._id);
     console.log('Пользователь успешно создан:', selectedUser);
-    req.user = user;
-    next();
     res.status(201).send(selectedUser);
   } catch (err) {
     if (err.name === 'MongoServerError' && err.code === 11000) {
