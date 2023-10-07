@@ -14,13 +14,13 @@ const errorHandler = require('./middlewares/errorHandler');
 
 mongoose.connect(DB_URL, { useNewUrlParser: true });
 const app = express();
-app.use(cors({
-  credentials: true,
-  maxAge: 15,
-  optionsSuccessStatus: 200,
-  origin: ['http://localhost:3000', 'https://aldonmovie.nomoredomainsicu.ru', 'http://aldonmovie.nomoredomainsicu.ru'],
-}));
-
+// app.use(cors({
+//   credentials: true,
+//   maxAge: 15,
+//   optionsSuccessStatus: 200,
+//   origin: ['http://localhost:3000', 'https://aldonmovie.nomoredomainsicu.ru', 'http://aldonmovie.nomoredomainsicu.ru'],
+// }));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());

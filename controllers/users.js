@@ -19,6 +19,8 @@ module.exports.createUser = async (req, res, next) => {
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hash });
     const selectedUser = await User.findById(user._id);
+    console.log('Пользователь успешно создан:', selectedUser);
+
     res.status(201).send(selectedUser);
   } catch (err) {
     if (err.name === 'MongoServerError' && err.code === 11000) {
@@ -36,14 +38,19 @@ module.exports.login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    console.log(user);
-    console.log(isPasswordCorrect);
+    if (!user || !isPasswordCorrect) {
+      throw new UnauthorizedError('Ошибка при авторизации пользователя');
+    }
+
+    console.log('Пользователь успешно вошел:', user);
+    console.log('Пароль верный:', isPasswordCorrect);
+
     const token = jwt.sign(
       { _id: user._id },
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
       { expiresIn: '7d' },
     );
-    console.log(token);
+    console.log('Сгенерированный токен:', token);
     res.status(200).send({ token });
     // res.cookie('token', token, { httpOnly: true }).status(200).send({ token });
   } catch (err) {
