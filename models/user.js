@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const { isEmail } = require('validator');
 const { validationMessage } = require('../utils/errorMessage');
+const { emailRegex } = require('../utils/constants');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     required: [true, validationMessage.required],
     unique: true,
     validate: {
-      validator: (text) => isEmail(text),
+      validator: (text) => emailRegex.test(text),
       message: validationMessage.email,
     },
   },
